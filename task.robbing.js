@@ -7,7 +7,7 @@ mod.register = () => {};
 // for each flag
 mod.handleFlagFound = flag => {
     // if it is a robbing flag
-    if( flag.color == flag.compareTo(FLAG_COLOR.invade.robbing)){
+    if (flag.compareTo(FLAG_COLOR.invade.robbing)) {
         // check if a new creep has to be spawned
         Task.robbing.checkForRequiredCreeps(flag);
     }
