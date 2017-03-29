@@ -2841,11 +2841,6 @@ mod.roomDistance = function(roomName1, roomName2, diagonal, continuous){
     //if( diagonal ) return Math.max(xDif, yDif); // count diagonal as 1
     return xDif + yDif; // count diagonal as 2
 };
-mod.getCostMatrix = function(roomName) {
-    var room = Game.rooms[roomName];
-    if(!room) return;
-    return room.costMatrix;
-};
 mod.loadCostMatrixCache = function(cache) {
     let count = 0;
     for (const key in cache) {
