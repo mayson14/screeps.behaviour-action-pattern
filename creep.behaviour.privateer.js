@@ -66,7 +66,7 @@ mod.nextAction = function(creep){
         // at target room
         if( creep.flag && creep.flag.pos.roomName == creep.pos.roomName ){
             // check invader/cloaking state
-            if( creep.room.situation.invasion && !Flag.compare(creep.flag, FLAG_COLOR.invade.robbing)) {
+            if( creep.room.situation.invasion && !creep.flag.compareTo(FLAG_COLOR.invade.robbing)) {
                 creep.flag.cloaking = 50; // TODO: set to Infinity & release when solved
                 this.exploitNextRoom(creep);
                 return;
