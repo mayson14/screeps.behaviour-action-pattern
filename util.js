@@ -182,12 +182,12 @@ module.exports = {
     /**
      * Build a stacktrace if DEBUG_STACKS or the first argument is true.
      */
-    stack(force = false) {
+    stack(force = false, placeholder = ' ') {
         if (DEBUG_STACKS || force) {
             return new Error(`STACK; param:${DEBUG_STACKS}, force:${force}`).stack;
         }
 
-        return ' ';
+        return placeholder;
     },
 
     /**
