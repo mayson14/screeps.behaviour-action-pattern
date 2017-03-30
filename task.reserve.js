@@ -29,7 +29,7 @@ mod.handleFlagFound = flag => {
 // check if a new creep has to be spawned
 mod.checkForRequiredCreeps = (flag) => {
     let spawnParams;
-    if( flag.color == flag.compareTo(FLAG_COLOR.claim.mining)) {
+    if (flag.compareTo(FLAG_COLOR.claim.mining)) {
         spawnParams = Task.mining.strategies.reserve.spawnParams(flag);
     } else {
         spawnParams = mod.strategies.defaultStrategy.spawnParams(flag);
