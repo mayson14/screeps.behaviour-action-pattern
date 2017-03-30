@@ -60,22 +60,23 @@ mod.saveSegment = (range, inputData) => {
 	let keyNum = 0;
 	let encodedData;
 	for (let id = range.start; id <= range.end; id++) {
-		if (keyNum < keys.length) { // more data to save
+		if (keyNum < keys.length || encodedData.length > 1) { // more data to save
 			if (RawMemory.segments[id] || numActive + mod.numSaved < 10) {
 				let temp;
+				let full = false;
 				while (keyNum < keys.length) {
 					const key = keys[keyNum];
 					keyNum++;
 					const stringified = JSON.stringify(inputData[key]);
 					temp = `"${key}":${stringified}`;
-					if (!encodedData || (encodedData.length + temp.length + 1) / 1024 < 100) {
-	 					encodedData = encodedData ? encodedData + ',' + temp : '{' + temp;
-					} else break;
+					full = encodedData && (encodedData.length + temp.length + 1) / 1024 > 100;
+					if (full) break;
+					encodedData = encodedData ? encodedData + ',' + temp : '{' + temp;
 				}
 				if (DEBUG) logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
 				RawMemory.segments[id] = encodedData + '}';
 				Memory.cacheValid[id] = Game.time;
-				encodedData = '{' + temp;
+				encodedData = full && temp ? '{' + temp : '{';
 				if (!Memory.activeSegments[id]) mod.numSaved++;
 			} else if (numActive >= 10) {
 				// TODO: also defer?
