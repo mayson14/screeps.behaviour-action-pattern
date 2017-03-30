@@ -214,19 +214,15 @@ mod.flagType = function(flag) {
     if (mod.isSpecialFlag(flag)) return '_OCS';
     for (const primary in FLAG_COLOR) {
         const obj = FLAG_COLOR[primary];
-        if (flag.color === obj.color) {
-            if (flag.secondaryColor === obj.secondaryColor) {
-                return primary + '.' + primary;
-            } else {
-                for (const secondary in obj) {
-                    if (flag.secondaryColor === obj[secondary].secondaryColor) {
-                        return primary + '.' + secondary;
-                    }
-                }
-            }
+        if (Flag.compare(flag, obj)) {
+            return primary;
+        }
+        for (const secondary in obj) {
+            const obj = obj[secondary];
+            if (Flag.compare(flag, obj)) return `${primary}.${secondary}`;
         }
     }
-    logError('Unknown flag type for flag ' + flag ? flag.name : 'undefined flag');
+    logError(`Unknown flag type for flag: ${flag ? flag.name : 'undefined flag'}.`);
     return 'undefined';
 };
 mod.specialFlag = function(create) {
