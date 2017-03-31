@@ -1073,14 +1073,16 @@ mod.extend = function(){
     });
     Room.prototype.countMySites = function() {
         const numSites = _.size(this.myConstructionSites);
-        if (!_.isUndefined(this.memory.myTotalSites) && numSites !== this.memory.myTotalSites) {
+        // only trigger when a construction site has been added
+        if (!_.isUndefined(this.memory.myTotalSites) && numSites > this.memory.myTotalSites) {
             Room.costMatrixInvalid.trigger(this);
         }
         this.memory.myTotalSites = numSites;
     };
     Room.prototype.countMyStructures = function() {
         const numStructures = _.size(this.structures.my);
-        if (!_.isUndefined(this.memory.myTotalStructures) && numStructures !== this.memory.myTotalStructures) {
+        // only trigger when a structure has been destroyed, we already avoid unpathable construction sites, and treat road sites like roads
+        if (!_.isUndefined(this.memory.myTotalStructures) && numStructures < this.memory.myTotalStructures) {
             Room.costMatrixInvalid.trigger(this);
         }
         this.memory.myTotalStructures = numStructures;
