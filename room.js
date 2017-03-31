@@ -2782,7 +2782,7 @@ mod.totalStructuresChanged = function() {
 };
 mod.analyze = function() {
     const totalSitesChanged = Room.totalSitesChanged();
-    const totalStructuresChanged = Room.totalStructuresChanged;
+    const totalStructuresChanged = Room.totalStructuresChanged();
     const getEnvironment = room => {
         try {
             if( Game.time % MEMORY_RESYNC_INTERVAL == 0 || room.name == 'sim' ) {
