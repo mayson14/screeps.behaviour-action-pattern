@@ -8,8 +8,7 @@ action.isValidAction = function(creep){
 action.isValidTarget = function(target, creep){
     if (!target) return false;
     if (target instanceof Flag) {
-        return _.eq(target, FlagDir.flagFilter(FLAG_COLOR.claim.spawn)) ||
-                _.eq(target, FlagDir.flagFilter(FLAG_COLOR.command.drop));
+        return target.compareTo(FLAG_COLOR.claim.spawn) || target.compareTo(FLAG_COLOR.command.drop);
     }
     return true;
 };
@@ -22,7 +21,7 @@ action.newTarget = function(creep) {
     if( !drop ) {
         drop = creep.pos.findClosestByRange(creep.room.find(FIND_FLAGS, FlagDir.flagFilter(FLAG_COLOR.claim.spawn)));
     }
-    return drop || false;
+    return drop;
 };
 action.work = function(creep) {
     let ret = OK;
