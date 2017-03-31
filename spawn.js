@@ -38,8 +38,12 @@ mod.extend = function(){
         return null;
     };
     Spawn.prototype.createCreepByQueue = function(queue){
-        if( !queue || queue.length == 0 ) return null;
-        let params = queue.shift();
+        if (!queue) return null;
+        let params;
+        do {
+            if (queue.length === 0) return null;
+            params = queue.shift();
+        } while (Memory.CPU_CRITICAL && !CRITICAL_ROLES.includes(params.behaviour));
         let cost = 0;
         params.parts.forEach(function(part){
             cost += BODYPART_COST[part];
