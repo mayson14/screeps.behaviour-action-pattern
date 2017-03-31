@@ -2674,10 +2674,6 @@ mod.extend = function(){
             logSystem(this.name, line);
         }
     };
-    Room.prototype.rebuildCostMatrix = function(roomName) {
-        mod.pathfinderCache[roomName] = {};
-        mod.pathfinderCacheDirty = true;
-    };
     Room.prototype.controlObserver = function() {
         const OBSERVER = this.structures.observer;
         if (!OBSERVER) return;
@@ -2911,7 +2907,8 @@ mod.cleanup = function() {
 };
 mod.rebuildCostMatrix = function(roomName) {
     if (DEBUG) logSystem(roomName, 'Removing invalid costmatrix to force a rebuild.')
-    delete Memory.pathfinder[roomName];
+    mod.pathfinderCache[roomName] = {};
+    mod.pathfinderCacheDirty = true;
 };
 mod.bestSpawnRoomFor = function(targetRoomName) {
     var range = room => room.my ? routeRange(room.name, targetRoomName) : Infinity;
