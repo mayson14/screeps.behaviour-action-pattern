@@ -2672,8 +2672,8 @@ mod.extend = function(){
             logSystem(this.name, line);
         }
     };
-    Room.prototype.rebuildCostMatrix = function() {
-        mod.pathfinderCache[this.name] = {};
+    Room.prototype.rebuildCostMatrix = function(roomName) {
+        mod.pathfinderCache[roomName] = {};
         mod.pathfinderCacheDirty = true;
     };
     Room.prototype.controlObserver = function() {
