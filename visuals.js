@@ -503,7 +503,7 @@ Visuals.extend = function() {
 };
 
 Visuals.run = function() {
-    const p = startProfiling('Visuals', Game.cpu.getUsed());
+    const p = Util.startProfiling('Visuals', Game.cpu.getUsed());
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         if (!ROOM_VISUALS_ALL && !room.my) continue;
