@@ -247,7 +247,6 @@ module.exports.loop = function () {
     // let the cpu recover a bit above the threshold before disengaging to prevent thrashing
     Memory.CPU_CRITICAL = Memory.CPU_CRITICAL ? Game.cpu.bucket < CRITICAL_BUCKET_LEVEL + CRITICAL_BUCKET_OVERFILL : Game.cpu.bucket < CRITICAL_BUCKET_LEVEL;
     if (!cpuAtFirstLoop) cpuAtFirstLoop = cpuAtLoop;
-
     // ensure required memory namespaces
     if (Memory.modules === undefined)  {
         global.install();

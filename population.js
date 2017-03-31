@@ -236,7 +236,7 @@ mod.analyze = function(){
     };
     _.forEach(Memory.population, c => {
         register(c);
-        p.checkCPU('Register: ' + c.creepName, PROFILING.ANAYLYZE_LIMIT / _.size(Memory.population));
+        p.checkCPU('Register: ' + c.creepName, PROFILING.ANALYZE_LIMIT / 2);
     });
 
     let validateAssignment = entry => {
@@ -256,7 +256,7 @@ mod.analyze = function(){
     };
     _.forEach(Memory.population, c => {
         validateAssignment(c);
-        p.checkCPU('Validate: ' + c.creepName, PROFILING.ANAYLYZE_LIMIT / _.size(Memory.population));
+        p.checkCPU('Validate: ' + c.creepName, PROFILING.ANALYZE_LIMIT / 2);
     });
 };
 mod.execute = function(){

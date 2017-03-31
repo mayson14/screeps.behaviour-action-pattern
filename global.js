@@ -457,6 +457,7 @@ mod.loadProfiler = function(reset) {
         };
     }
     mod.profiler = Memory.profiler;
+    mod.profiler.numCalls = 0;
 };
 mod.startProfiling = function(name, options) {
     const enabled = _.get(options, 'enabled', true);
@@ -482,7 +483,7 @@ mod.startProfiling = function(name, options) {
         if (PROFILE) {
             checkCPU = function(localName, limit, type) {
                 let current = Game.cpu.getUsed();
-                let used = _.round(current - start, 2);
+                let used = _.round(current - start, 4);
                 if (!limit || used > limit) {
                     logSystem(name + ':' + localName, used);
                 }
@@ -496,6 +497,7 @@ mod.startProfiling = function(name, options) {
                     mod.profiler.types[type].count++;
                 }
                 start = current;
+                mod.profiler.numCalls++;
             };
         }
         totalCPU = function() {
@@ -518,8 +520,10 @@ mod.startProfiling = function(name, options) {
                     data.count = 0;
                 }
             }
+            const approxOverhead = mod.profiler.numCalls * 0.01;
+            mod.profiler.numCalls = 0;
             logSystem(name, ' loop:' + _.round(totalUsed, 2) + ' other:' + _.round(onLoad, 2) + ' avg:' + _.round(avgCPU, 2) + ' ticks:' +
-                mod.profiler.totalTicks + ' bucket:' + Game.cpu.bucket, 2);
+                mod.profiler.totalTicks + ' bucket:' + Game.cpu.bucket + ' overhead:' + approxOverhead, 2);
             if (PROFILE) console.log('\n');
             Memory.profiler = mod.profiler;
         };
