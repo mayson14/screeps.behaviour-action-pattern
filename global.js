@@ -471,7 +471,7 @@ mod.startProfiling = function(name, options) {
         // Memory.profiling.cpu += thisTick;
         // logSystem('Total', _.round(thisTick, 2) + ' ' + _.round(Memory.profiling.cpu / Memory.profiling.ticks, 2));
     };
-    if ((PROFILE || DEBUG) && enabled) {
+    if ((PROFILE) && enabled) {
         if (_.isUndefined(Memory.profiler)) resetProfiler();
         else if (!mod.profiler ||
             mod.profiler.validTick !== Memory.profiler.validTick ||
@@ -480,7 +480,7 @@ mod.startProfiling = function(name, options) {
         }
         const onLoad = _.get(options, 'startCPU', Game.cpu.getUsed());
         let start = onLoad;
-        if (PROFILE) {
+        if (PROFILE && !PROFILING.BASIC_ONLY) {
             checkCPU = function(localName, limit, type) {
                 let current = Game.cpu.getUsed();
                 let used = _.round(current - start, 4);

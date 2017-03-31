@@ -10,7 +10,8 @@ let mod = {
     PROFILE: false, // enable CPU profiling
     PROFILING: {
         ANALYZE_LIMIT: 2, // profile warning levels
-        AVERAGE_USAGE: true, // display average creep & flag usage
+        AVERAGE_USAGE: false, // display average creep & flag usage
+        BASIC_ONLY: true, // only display basic profiling information, disables all other profiling
         CREEPS: false,
         EXECUTE_LIMIT: 5, // profile warning levels
         FLAGS: false,
