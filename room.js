@@ -2779,6 +2779,8 @@ mod.totalStructuresChanged = function() {
     return oldStructures && oldStructures !== numStructures;
 };
 mod.analyze = function() {
+    const totalSitesChanged = Room.totalSitesChanged();
+    const totalStructuresChanged = Room.totalStructuresChanged;
     const getEnvironment = room => {
         try {
             if( Game.time % MEMORY_RESYNC_INTERVAL == 0 || room.name == 'sim' ) {
@@ -2803,8 +2805,8 @@ mod.analyze = function() {
             room.processInvaders();
             room.processLabs();
             room.processPower();
-            if (Room.totalSitesChanged()) room.countMySites();
-            if (Room.totalStructuresChanged()) room.countMyStructures();
+            if (totalSitesChanged) room.countMySites();
+            if (totalStructuresChanged) room.countMyStructures();
         }
         catch(err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
