@@ -72,7 +72,7 @@ setup.RCL = {
         minEnergyAvailable: room => setup.hasMinerOrHauler(room) ? 0.3 : 0,
         maxMulti: 8,
         maxCount: (room) => ( room.situation.invasion || room.storage ) ? setup.maxWorker(room) : 2,
-        maxWeight: 4800
+        maxWeight: 9600
     },
     5: {
         fixedBody: [],
@@ -81,7 +81,7 @@ setup.RCL = {
         minEnergyAvailable: room => setup.hasMinerOrHauler(room) ? 0.3 : 0,
         maxMulti: 8,
         maxCount: room => setup.maxWorker(room),
-        maxWeight: 2000
+        maxWeight: 9600
     },
     6: {
         fixedBody: [],
@@ -90,7 +90,7 @@ setup.RCL = {
         minEnergyAvailable: room => setup.hasMinerOrHauler(room) ? 0.3 : 0,
         maxMulti: 8,
         maxCount: room => setup.maxWorker(room),
-        maxWeight: 2000
+        maxWeight: 9600
     },
     7: {
         fixedBody: [],
@@ -99,7 +99,7 @@ setup.RCL = {
         minEnergyAvailable: room => setup.hasMinerOrHauler(room) ? 0.2 : 0,
         maxMulti: 10,
         maxCount: room => setup.maxWorker(room),
-        maxWeight: 2000
+        maxWeight: 9600
     },
     8: {
         fixedBody: [],
@@ -108,6 +108,6 @@ setup.RCL = {
         minEnergyAvailable: room => setup.hasMinerOrHauler(room) ? 0.1 : 0,
         maxMulti: room => (( !room.storage || room.storage.energy > MAX_STORAGE_ENERGY[8] ) ? 16 : 10),
         maxCount: room => setup.maxWorker(room),
-        maxWeight: 3200
+        maxWeight: 9600
     }
 };
