@@ -213,13 +213,13 @@ mod.cleanup = function(){
 mod.flagType = function(flag) {
     if (mod.isSpecialFlag(flag)) return '_OCS';
     for (const primary in FLAG_COLOR) {
-        const obj = FLAG_COLOR[primary];
-        if (Flag.compare(flag, obj)) {
+        const type = FLAG_COLOR[primary];
+        if (Flag.compare(flag, type)) {
             return primary;
         }
-        for (const secondary in obj) {
-            const obj = obj[secondary];
-            if (Flag.compare(flag, obj)) return `${primary}.${secondary}`;
+        for (const secondary in type) {
+            const subType = type[secondary];
+            if (Flag.compare(flag, subType)) return `${primary}.${secondary}`;
         }
     }
     logError(`Unknown flag type for flag: ${flag ? flag.name : 'undefined flag'}.`);
