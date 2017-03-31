@@ -66,9 +66,13 @@ mod.saveSegment = (range, inputData) => {
 					keyNum++;
 					const stringified = JSON.stringify(inputData[key]);
 					temp = `"${key}":${stringified}`;
-					full = encodedData && (encodedData.length + temp.length + 1) / 1024 > 100;
+					full = (_.get(encodedData, 'length', 0) + _.get(temp, 'length', 0) + 2) / 1024 > 100;
 					if (full) break;
 					encodedData = encodedData ? encodedData + ',' + temp : '{' + temp;
+				}
+				if (!encodedData && temp && temp.length > 0) {
+					const size = _.round((temp.length + 2) / 1024, 2);
+					return logError('RawMemory', `Cannot save data at key ${keyNum}, exceeds 100kb limit ${size}kb`);
 				}
 				if (DEBUG) logSystem('OCSMemory.saveSegment', 'Saving ' + _.round(encodedData.length / 1024, 2) + 'kb of data to segment ' + id);
 				RawMemory.segments[id] = encodedData + '}';
