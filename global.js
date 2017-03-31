@@ -424,7 +424,6 @@ mod.memoryUsage = function(key) {
     string += `<tr><td>Total</td><td>${_.round(total, 2)}</td></tr></table>`;
     return string;
 };
-mod.profiler = null;
 mod.resetProfiler = function() {
     mod.loadProfiler(true);
 };
