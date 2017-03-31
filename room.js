@@ -7,6 +7,9 @@ mod.pathfinderCache = {};
 mod.pathfinderCacheDirty = false;
 mod.pathfinderCacheLoaded = false;
 mod.COSTMATRIX_CACHE_VERSION = 3; // change this to invalidate previously cached costmatrices
+mod.register = function() {
+    Room.costMatrixInvalid.on(room => Room.rebuildCostMatrix(room.name || room));
+};
 mod.extend = function(){
     let Container = function(room){
         this.room = room;
@@ -265,6 +268,15 @@ mod.extend = function(){
                         this._all = this.room.find(FIND_STRUCTURES);
                     }
                     return this._all;
+                }
+            },
+            'my': {
+                configurable: true,
+                get: function() {
+                    if( _.isUndefined(this._my) ){
+                        this._my = this.room.find(FIND_MY_STRUCTURES);
+                    }
+                    return this._my;
                 }
             },
             'spawns': {
@@ -1070,6 +1082,20 @@ mod.extend = function(){
             }
         },
     });
+    Room.prototype.countMySites = function() {
+        const numSites = _.size(this.myConstructionSites);
+        if (!_.isUndefined(this.memory.myTotalSites) && numSites !== this.memory.myTotalSites) {
+            Room.costMatrixInvalid.trigger(this);
+        }
+        this.memory.myTotalSites = numSites;
+    };
+    Room.prototype.countMyStructures = function() {
+        const numStructures = _.size(this.structures.my);
+        if (!_.isUndefined(this.memory.myTotalStructures) && numStructures !== this.memory.myTotalStructures) {
+            Room.costMatrixInvalid.trigger(this);
+        }
+        this.memory.myTotalStructures = numStructures;
+    };
     Room.prototype.registerIsHostile = function() {
         if (this.controller) {
             if (_.isUndefined(this.hostile) || typeof this.hostile === 'number') { // not overridden by user
@@ -2761,8 +2787,20 @@ mod.flush = function(){
         delete Memory.rooms.hostileRooms;
     }
 };
-mod.analyze = function(){
-    let getEnvironment = room => {
+mod.totalSitesChanged = function() {
+    const numSites = _.size(Game.constructionSites);
+    const oldSites = Memory.rooms.myTotalSites;
+    Memory.rooms.myTotalSites = numSites;
+    return oldSites && oldSites !== numSites;
+};
+mod.totalStructuresChanged = function() {
+    const numStructures = _.size(Game.structures);
+    const oldStructures = Memory.rooms.myTotalStructures;
+    Memory.rooms.myTotalStructures = numStructures;
+    return oldStructures && oldStructures !== numStructures;
+};
+mod.analyze = function() {
+    const getEnvironment = room => {
         try {
             if( Game.time % MEMORY_RESYNC_INTERVAL == 0 || room.name == 'sim' ) {
                 room.saveMinerals();
@@ -2786,6 +2824,8 @@ mod.analyze = function(){
             room.processInvaders();
             room.processLabs();
             room.processPower();
+            if (Room.totalSitesChanged()) room.countMySites();
+            if (Room.totalStructuresChanged()) room.countMyStructures();
         }
         catch(err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
@@ -2850,6 +2890,10 @@ mod.cleanup = function() {
         OCSMemory.saveSegment(MEM_SEGMENTS.COSTMATRIX_CACHE, encodedCache);
         mod.pathfinderCacheDirty = false;
     }
+};
+mod.rebuildCostMatrix = function(roomName) {
+    if (DEBUG) logSystem(roomName, 'Removing invalid costmatrix to force a rebuild.')
+    delete Memory.pathfinder[roomName];
 };
 mod.bestSpawnRoomFor = function(targetRoomName) {
     var range = room => room.my ? routeRange(room.name, targetRoomName) : Infinity;
