@@ -59,7 +59,7 @@ mod.saveSegment = (range, inputData) => {
 	const keys = Object.keys(inputData);
 	let keyNum = 0;
 	let encodedData;
-	for (let id = range.start; id <= range.end; id++) {
+	for (let id = range.start; id >= range.end; id--) {
 		if (keyNum < keys.length || encodedData.length > 1) { // more data to save
 			if (RawMemory.segments[id] || numActive + mod.numSaved < 10) {
 				let temp;
