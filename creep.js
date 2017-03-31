@@ -56,7 +56,7 @@ mod.extend = function(){
                     return;
                 }
             }
-            let p = startProfiling('Creep.run');
+            const p = startProfiling('Creep.run', {enabled:PROFILING.CREEPS});
             if (this.data && !_.contains(['remoteMiner', 'miner', 'upgrader'], this.data.creepType)) {
                 this.repairNearby();
             }
@@ -114,7 +114,7 @@ mod.extend = function(){
                 Creep.behaviour.ranger.heal(this);
                 if( SAY_ASSIGNMENT ) this.say(String.fromCharCode(10133), SAY_PUBLIC);
             }
-            p.checkCPU(this.name, 5, this.data ? this.data.creepType : 'noType');
+            p.checkCPU(this.name, PROFILING.EXECUTE_LIMIT / _.size(Memory.population), this.data ? this.data.creepType : 'noType');
         }
 
         strategy.freeStrategy(this);

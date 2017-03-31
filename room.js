@@ -2811,10 +2811,11 @@ mod.totalStructuresChanged = function() {
     Memory.rooms.myTotalStructures = numStructures;
     return oldStructures && oldStructures !== numStructures;
 };
-mod.analyze = function() {
+mod.analyze = function(){
+    const p = startProfiling('Room.analyze', {enabled:PROFILING.ROOMS});
     const totalSitesChanged = Room.totalSitesChanged();
     const totalStructuresChanged = Room.totalStructuresChanged();
-    const getEnvironment = room => {
+    let getEnvironment = room => {
         try {
             if( Game.time % MEMORY_RESYNC_INTERVAL == 0 || room.name == 'sim' ) {
                 room.saveMinerals();
@@ -2846,9 +2847,13 @@ mod.analyze = function() {
             console.log( dye(CRAYON.error, 'Error in room.js (Room.prototype.loop) for "' + room.name + '": <br/>' + (err.stack || err.toString()) + '<br/>' + err.stack));
         }
     };
-    _.forEach(Game.rooms, getEnvironment);
+    _.forEach(Game.rooms, r => {
+        getEnvironment(r);
+        p.checkCPU(r.name, PROFILING.ANALYZE_LIMIT / _.size(Game.rooms));
+    });
 };
 mod.execute = function() {
+    const p = startProfiling('Room.execute', {enabled:PROFILING.ROOMS});
     let triggerNewInvaders = creep => {
         // create notification
         let bodyCount = JSON.stringify( _.countBy(creep.body, 'type') );
@@ -2880,6 +2885,7 @@ mod.execute = function() {
         if (room) {
             if (room.structures.observer) room.controlObserver();
         }
+        p.checkCPU(roomName, PROFILING.EXECUTE_LIMIT / _.size(Memory.rooms));
     });
 };
 mod.cleanup = function() {
