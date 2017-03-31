@@ -2782,7 +2782,7 @@ mod.analyze = function(){
     };
     _.forEach(Game.rooms, r => {
         getEnvironment(r);
-        p.checkCPU(r.name, PROFILING.ANALYZE_LIMIT / _.size(Game.rooms));
+        p.checkCPU(r.name, PROFILING.ANALYZE_LIMIT / 5);
     });
 };
 mod.execute = function() {
@@ -2818,7 +2818,7 @@ mod.execute = function() {
         if (room) {
             if (room.structures.observer) room.controlObserver();
         }
-        p.checkCPU(roomName, PROFILING.EXECUTE_LIMIT / _.size(Memory.rooms));
+        p.checkCPU(roomName, PROFILING.EXECUTE_LIMIT / 5);
     });
 };
 
