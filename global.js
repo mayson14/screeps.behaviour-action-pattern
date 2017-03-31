@@ -442,7 +442,8 @@ mod.loadProfiler = function(reset) {
     }
     mod.profiler = Memory.profiler;
 };
-mod.startProfiling = function(name, startCPU) {
+mod.startProfiling = function(name, options) {
+    const enabled = _.get(options, 'enabled', true);
     let checkCPU = function(localName, limit, type) {
     };
     let totalCPU = function() {
@@ -453,14 +454,14 @@ mod.startProfiling = function(name, startCPU) {
         // Memory.profiling.cpu += thisTick;
         // logSystem('Total', _.round(thisTick, 2) + ' ' + _.round(Memory.profiling.cpu / Memory.profiling.ticks, 2));
     };
-    if (PROFILE || DEBUG) {
+    if ((PROFILE || DEBUG) && enabled) {
         if (_.isUndefined(Memory.profiler)) resetProfiler();
         else if (!mod.profiler ||
             mod.profiler.validTick !== Memory.profiler.validTick ||
             mod.profiler.totalTicks < Memory.profiler.totalTicks) {
             loadProfiler();
         }
-        const onLoad = startCPU || Game.cpu.getUsed();
+        const onLoad = _.get(options, 'startCPU', Game.cpu.getUsed());
         let start = onLoad;
         if (PROFILE) {
             checkCPU = function(localName, limit, type) {
