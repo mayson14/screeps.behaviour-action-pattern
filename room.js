@@ -880,7 +880,7 @@ mod.extend = function(){
                         } 
                         this._structureMatrix = mod.pathfinderCache[this.name].costMatrix;
                     } else {
-                        if (DEBUG) logSystem(this.name, 'Calulating cost matrix');
+                        if (DEBUG) logSystem(this.name, 'Calculating cost matrix');
                         var costMatrix = new PathFinder.CostMatrix();
                         let setCosts = structure => {
                             const site = structure instanceof ConstructionSite;

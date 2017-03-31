@@ -220,10 +220,7 @@ global.install = () => {
     Task.populate();
     // custom extend
     if( global.mainInjection.extend ) global.mainInjection.extend();
-    // reload cached data from memory segment
-    for (let i = MEM_SEGMENTS.COSTMATRIX_CACHE.start; i <= MEM_SEGMENTS.COSTMATRIX_CACHE.end; i++) {
-        OCSMemory.activateSegment(i);
-    }
+    OCSMemory.activateSegment(MEM_SEGMENTS.COSTMATRIX_CACHE, true);
     if (DEBUG) logSystem('Global.install', 'Code reloaded.');
 };
 global.install();
