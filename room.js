@@ -1097,14 +1097,16 @@ mod.extend = function(){
     });
     Room.prototype.countMySites = function() {
         const numSites = _.size(this.myConstructionSites);
-        if (!_.isUndefined(this.memory.myTotalSites) && numSites !== this.memory.myTotalSites) {
+        // only trigger when a construction site has been added
+        if (!_.isUndefined(this.memory.myTotalSites) && numSites > this.memory.myTotalSites) {
             Room.costMatrixInvalid.trigger(this);
         }
         this.memory.myTotalSites = numSites;
     };
     Room.prototype.countMyStructures = function() {
         const numStructures = _.size(this.structures.my);
-        if (!_.isUndefined(this.memory.myTotalStructures) && numStructures !== this.memory.myTotalStructures) {
+        // only trigger when a structure has been destroyed, we already avoid unpathable construction sites, and treat road sites like roads
+        if (!_.isUndefined(this.memory.myTotalStructures) && numStructures < this.memory.myTotalStructures) {
             Room.costMatrixInvalid.trigger(this);
         }
         this.memory.myTotalStructures = numStructures;
@@ -2814,6 +2816,8 @@ mod.totalStructuresChanged = function() {
     return oldStructures && oldStructures !== numStructures;
 };
 mod.analyze = function() {
+    const totalSitesChanged = Room.totalSitesChanged();
+    const totalStructuresChanged = Room.totalStructuresChanged();
     const getEnvironment = room => {
         try {
             if( Game.time % MEMORY_RESYNC_INTERVAL == 0 || room.name == 'sim' ) {
@@ -2838,8 +2842,8 @@ mod.analyze = function() {
             room.processInvaders();
             room.processLabs();
             room.processPower();
-            if (Room.totalSitesChanged()) room.countMySites();
-            if (Room.totalStructuresChanged()) room.countMyStructures();
+            if (totalSitesChanged) room.countMySites();
+            if (totalStructuresChanged) room.countMyStructures();
         }
         catch(err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
