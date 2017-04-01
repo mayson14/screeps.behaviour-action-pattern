@@ -39,11 +39,16 @@ mod.extend = function(){
     };
     Spawn.prototype.createCreepByQueue = function(queue){
         if (!queue) return null;
+        const original = _.cloneDeep(queue);
         let params;
         do {
-            if (queue.length === 0) return null;
+            if (queue.length === 0) break;
             params = queue.shift();
         } while (Memory.CPU_CRITICAL && !CRITICAL_ROLES.includes(params.behaviour));
+        if (queue.length === 0 && !params) {
+            queue = original;
+            return null;
+        }
         let cost = 0;
         params.parts.forEach(function(part){
             cost += BODYPART_COST[part];
