@@ -260,7 +260,8 @@ module.exports.loop = function () {
     }
     // ensure up to date parameters
     _.assign(global, load("parameter"));
-    
+    _.assign(global, Memory.parameters);
+   
     // process loaded memory segments
     OCSMemory.processSegments();
     p.checkCPU('processSegments', PROFILING.ANALYZE_LIMIT);
