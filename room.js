@@ -423,7 +423,7 @@ mod.extend = function(){
 	                if (_.isUndefined(this.room.memory.observer)) {
 		                this.room.saveObserver();
 	                }
-                    if (_.isUndefined(this._observer)) {
+                    if (_.isUndefined(this._observer) && this.room.memory.observer) {
 	                    this._observer = Game.getObjectById(this.room.memory.observer.id);
                     }
                     return this._observer;
@@ -436,7 +436,7 @@ mod.extend = function(){
                         this.room.saveNukers();
                     }
                     if (_.isUndefined(this._nuker)) {
-                        if (this.room.memory.nukers.length > 0) {
+                        if (this.room.memory.nukers && this.room.memory.nukers.length > 0) {
                             this._nuker = Game.getObjectById(this.room.memory.nukers[0].id);
                         }
                     }
@@ -459,7 +459,7 @@ mod.extend = function(){
                         this.room.savePowerSpawns();
                     }
                     if (_.isUndefined(this._powerSpawn)) {
-                        if (this.room.memory.powerSpawns.length > 0) {
+                        if (this.room.memory.powerSpawns && this.room.memory.powerSpawns.length > 0) {
                             this._powerSpawn = Game.getObjectById(this.room.memory.powerSpawns[0].id);
                         }
                     }
@@ -482,7 +482,7 @@ mod.extend = function(){
                         this.room.saveExtensions();
                     }
                     if (_.isUndefined(this._extensions)) {
-                        this._extensions = this.room.memory.extensions.map(e => Game.getObjectById(e));
+                        this._extensions = _.map(this.room.memory.extensions, e => Game.getObjectById(e));
                     }
                     return this._extensions;
                 },
@@ -1225,7 +1225,7 @@ mod.extend = function(){
         [this.memory.observer.id] = this.find(FIND_MY_STRUCTURES, {
             filter: s => s instanceof StructureObserver
         }).map(s => s.id);
-        if (_.size(this.memory.observer) === 0) delete this.memory.observer;
+        if (_.isUndefined(this.memory.observer.id)) delete this.memory.observer;
     };
     Room.prototype.saveNukers = function() {
         let nukers = this.find(FIND_MY_STRUCTURES, {
@@ -1826,8 +1826,10 @@ mod.extend = function(){
         let that = this;
         if( this.memory.hostileIds === undefined )
             this.memory.hostileIds = [];
-        if( this.memory.statistics === undefined)
+        if (!SEND_STATISTICS_REPORTS) delete this.memory.statistics;
+        else if (this.memory.statistics === undefined) {
             this.memory.statistics = {};
+        }
 
         let registerHostile = creep => {
             if (Room.isCenterNineRoom(this.name)) return;
@@ -1837,7 +1839,7 @@ mod.extend = function(){
                 // register
                 that.memory.hostileIds.push(creep.id);
                 // save to trigger subscribers later
-                that.newInvader.push(creep)
+                that.newInvader.push(creep);
                 // create statistics
                 if( SEND_STATISTIC_REPORTS ) {
                     let bodyCount = JSON.stringify( _.countBy(creep.body, 'type') );
@@ -1852,7 +1854,7 @@ mod.extend = function(){
                     });
                 }
             }
-        }
+        };
         _.forEach(this.hostiles, registerHostile);
 
         let registerHostileLeave = id => {
@@ -1861,7 +1863,7 @@ mod.extend = function(){
             // for each known invader
             if( !that.hostileIds.includes(id) && !stillHostile ) { // not found anymore or no longer hostile
                 // save to trigger subscribers later
-                that.goneInvader.push(id)
+                that.goneInvader.push(id);
                 // update statistics
                 if( SEND_STATISTIC_REPORTS && that.memory.statistics && that.memory.statistics.invaders !== undefined && that.memory.statistics.invaders.length > 0 ){
                     let select = invader => invader.id == id && invader.leave === undefined;
@@ -1869,7 +1871,7 @@ mod.extend = function(){
                     if( entry != undefined ) entry.leave = Game.time;
                 }
             }
-        }
+        };
         _.forEach(this.memory.hostileIds, registerHostileLeave);
 
         this.memory.hostileIds = this.hostileIds;
@@ -2786,10 +2788,12 @@ mod.analyze = function(){
                 room.processConstructionFlags();
             }
             room.roadConstruction();
-            room.linkDispatcher();
-            room.processInvaders();
-            room.processLabs();
-            room.processPower();
+            if (room.structures.links.all.length > 0) room.linkDispatcher();
+            if (room.hostiles.length > 0) room.processInvaders();
+            if (room.structures.labs.all.length > 0) room.processLabs();
+            if (room.structures.powerSpawn) room.processPower();
+            if (totalSitesChanged) room.countMySites();
+            if (totalStructuresChanged) room.countMyStructures();
         }
         catch(err) {
             Game.notify('Error in room.js (Room.prototype.loop) for "' + room.name + '" : ' + err.stack ? err + '<br/>' + err.stack : err);
