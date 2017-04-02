@@ -1,4 +1,5 @@
 let mod = {
+    ME: _(Game.rooms).map('controller').filter('my').map('owner.username').first(),
     CHATTY: false, // creeps say their current action
     HONK: true, // HONK when stored path is blocked by other creeps
     OOPS: true, // Creeps say Oops when dropping energy during dropmining
@@ -132,7 +133,7 @@ let mod = {
     // function parameters: room. expected result: array
     CONSTRUCTION_PRIORITY: [STRUCTURE_SPAWN,STRUCTURE_EXTENSION,STRUCTURE_LINK,STRUCTURE_TERMINAL,STRUCTURE_STORAGE,STRUCTURE_TOWER,STRUCTURE_POWER_SPAWN,STRUCTURE_NUKER,STRUCTURE_OBSERVER,STRUCTURE_ROAD,STRUCTURE_CONTAINER,STRUCTURE_EXTRACTOR,STRUCTURE_LAB,STRUCTURE_WALL,STRUCTURE_RAMPART],
     CONTROLLER_SIGN: true,
-    CONTROLLER_SIGN_MESSAGE: `Territory of ${_.chain(Game.spawns).values().first().get('owner.username').value()}, an Open Collaboration Society user! (https://github.com/ScreepsOCS)`,
+    CONTROLLER_SIGN_MESSAGE: `Territory of ${this.ME}, an Open Collaboration Society user! (https://github.com/ScreepsOCS)`,
     CONTROLLER_SIGN_UPDATE: false, // Update sign message if user changes CONTROLLER_SIGN_MESSAGE
     MINERS_AUTO_BUILD: false, // miners and remoteMiners will build their own containers if they are missing.
     MINER_WORK_THRESHOLD: 50, // how long to wait before a miner checks for repairs/construction sites nearby again
@@ -161,5 +162,35 @@ let mod = {
     ROBBER_REHOME: false, // May robbers choose closer storage for delivery?
     OBSERVER_OBSERVE_RANGE: 3, // the range for observers to look at
     OBSERVER_OBSERVE_HIGHWAYS_ONLY: true, // the observers will only look at highways - changing this will require you to clear cached rooms
+    ACTION_SAY: { // what gets said on creep.action.*.onAssignment
+        ATTACK_CONTROLLER: String.fromCodePoint(0x1F5E1) + String.fromCodePoint(0x26F3),
+        AVOIDING: String.fromCodePoint(0x21A9),
+        BUILDING: String.fromCodePoint(0x2692),
+        BULLDOZING: String.fromCodePoint(0x1F4CC),
+        CHARGING: String.fromCodePoint(0x1F50B),
+        CLAIMING: String.fromCodePoint(0x26F3),
+        DEFENDING: String.fromCodePoint(0x2694),
+        DISMANTLING: String.fromCodePoint(0x1F527),
+        DROPPING: String.fromCodePoint(0x1F4A9),
+        FEEDING: String.fromCodePoint(0x1F355) + String.fromCodePoint(0x1F35F),
+        FORTIFYING: String.fromCodePoint(0x1F528),
+        FUELING: String.fromCodePoint(0x26FD),
+        GUARDING: String.fromCodePoint(0x1F46E) + String.fromCodePoint(0x1F3FC),
+        HARVESTING: String.fromCodePoint(0x26CF),
+        HEALING: String.fromCodePoint(0x26E8),
+        IDLE: String.fromCodePoint(0x1F3B6),
+        INVADING: String.fromCodePoint(0x1F52B),
+        PICKING: String.fromCodePoint(0x23EC),
+        REALLOCATING: String.fromCodePoint(0x2194),
+        RECYCLING: String.fromCodePoint(0x267B),
+        REPAIRING: String.fromCodePoint(0x1F528),
+        RESERVING: String.fromCodePoint(0x26F3),
+        ROBBING: String.fromCodePoint(0x1F480),
+        STORING: String.fromCodePoint(0x1F4E5) + String.fromCodePoint(0xFE0E),
+        TRAVELLING: String.fromCodePoint(0x1F3C3),
+        UNCHARGING: String.fromCodePoint(0x1F4E4) + String.fromCodePoint(0xFE0E),
+        UPGRADING: String.fromCodePoint(0x1F5FD),
+        WITHDRAWING: String.fromCodePoint(0x1F4E4),
+    }
 };
 module.exports = mod;
