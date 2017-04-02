@@ -1826,7 +1826,7 @@ mod.extend = function(){
         let that = this;
         if( this.memory.hostileIds === undefined )
             this.memory.hostileIds = [];
-        if (!SEND_STATISTICS_REPORTS) delete this.memory.statistics;
+        if (!SEND_STATISTIC_REPORTS) delete this.memory.statistics;
         else if (this.memory.statistics === undefined) {
             this.memory.statistics = {};
         }
