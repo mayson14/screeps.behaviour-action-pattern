@@ -3074,23 +3074,26 @@ mod.roomLayout = function(flag) {
         [STRUCTURE_EXTENSION]: FLAG_COLOR.construct,
     };
     
-    const [centerX, centerY] = [flag.x, flag.y];
+    const [centerX, centerY] = [flag.pos.x, flag.pos.y];
     
     const placed = [];
     const sites = [];
     
+    const failed = () => {
+        flag.pos.newFlag(FLAG_COLOR.command.invalidPosition, 'NO_ROOM');
+        flag.remove();
+        return false;
+    };
+    
     for (let x = 0; x < layout.length; x++) {
         for (let y = 0; y < layout[x].length; y++) {
-            const pos = room.getPositionAt(centerX + (x - layout.length / 2), centerY + (y - layout.length / 2));
+            const xPos = centerX + (x - layout.length / 2);
+            const yPos = centerY + (y - layout.length / 2);
+            if (xPos >= 50 || xPos < 0 || yPos >= 50 || yPos < 0) return failed();
+            const pos = room.getPositionAt(xPos, yPos);
             const structureType = layout[x] && layout[x][y];
             if (structureType) {
-                if (Game.map.getTerrainAt(pos) === 'wall') {
-                    flag.pos.newFlag(FLAG_COLOR.command.invalidPosition, 'NO_ROOM');
-                    flag.remove();
-                    placed.splice(0, placed.length); // clear arrays
-                    sites.splace(0, sites.length);
-                    return false;
-                }
+                if (Game.map.getTerrainAt(pos) === 'wall') return failed();
                 if (structureType === STRUCTURE_ROAD) {
                     sites.push(pos);
                 } else {
