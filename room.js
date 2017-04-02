@@ -3087,8 +3087,8 @@ mod.roomLayout = function(flag) {
     
     for (let x = 0; x < layout.length; x++) {
         for (let y = 0; y < layout[x].length; y++) {
-            const xPos = centerX + (x - layout.length / 2);
-            const yPos = centerY + (y - layout.length / 2);
+            const xPos = centerX + (x - layout.length / 2) + 1;
+            const yPos = centerY + (y - layout.length / 2) + 1;
             if (xPos >= 50 || xPos < 0 || yPos >= 50 || yPos < 0) return failed();
             const pos = room.getPositionAt(xPos, yPos);
             const structureType = layout[x] && layout[x][y];
