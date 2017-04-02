@@ -152,9 +152,13 @@ mod.FLAG_COLOR = {
             color: COLOR_WHITE,
             secondaryColor: COLOR_YELLOW,
         },
-        roomLayout: {
+        _OCS: {
             color: COLOR_WHITE,
             secondaryColor: COLOR_PURPLE,
+        },
+        roomLayout: {
+            color: COLOR_WHITE,
+            secondaryColor: COLOR_CYAN,
         },
         invalidPosition: {
             color: COLOR_WHITE,
