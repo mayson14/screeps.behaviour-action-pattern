@@ -847,7 +847,7 @@ mod.extend = function(){
                 if( _.isUndefined(this._minerals) ){
                     this._minerals = [];
                     let add = id => { addById(this._minerals, id); };
-                    this.memory.minerals.forEach(add);
+                    _.forEach(this.memory.minerals, add);
                 }
                 return this._minerals;
             }
