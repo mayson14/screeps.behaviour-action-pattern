@@ -3113,4 +3113,6 @@ mod.roomLayout = function(flag) {
         if (_.size(Game.constructionSites) >= 100) return false;
         p.createConstructionSite(STRUCTURE_ROAD);
     });
+    
+    flag.remove();
 };
