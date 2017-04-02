@@ -1211,82 +1211,91 @@ mod.extend = function(){
         if( towers.length > 0 ){
             var id = obj => obj.id;
             this.memory.towers = _.map(towers, id);
-        } else this.memory.towers = [];
+        } else delete this.memory.towers;
     };
     Room.prototype.saveSpawns = function(){
         let spawns = this.find(FIND_MY_SPAWNS);
         if( spawns.length > 0 ){
             let id = o => o.id;
             this.memory.spawns = _.map(spawns, id);
-        } else this.memory.spawns = [];
+        } else delete this.memory.spawns;
     };
     Room.prototype.saveObserver = function() {
         this.memory.observer = {};
         [this.memory.observer.id] = this.find(FIND_MY_STRUCTURES, {
             filter: s => s instanceof StructureObserver
         }).map(s => s.id);
+        if (_.size(this.memory.observer) === 0) delete this.memory.observer;
     };
     Room.prototype.saveNukers = function() {
         let nukers = this.find(FIND_MY_STRUCTURES, {
             filter: (structure) => ( structure.structureType == STRUCTURE_NUKER )
         });
-        this.memory.nukers = [];
+        if (nukers.length > 0) {
+            this.memory.nukers = [];
 
-        // for each entry add to memory ( if not contained )
-        let add = (nuker) => {
-            let nukerData = this.memory.nukers.find( (l) => l.id == nuker.id );
-            if( !nukerData ) {
-                this.memory.nukers.push({
-                    id: nuker.id,
-                });
-            }
-        };
-        nukers.forEach(add);
+            // for each entry add to memory ( if not contained )
+            let add = (nuker) => {
+                let nukerData = this.memory.nukers.find( (l) => l.id == nuker.id );
+                if( !nukerData ) {
+                    this.memory.nukers.push({
+                        id: nuker.id,
+                    });
+                }
+            };
+            nukers.forEach(add);
+        } else delete this.memory.nukers;
     };
     Room.prototype.savePowerSpawns = function() {
         let powerSpawns = this.find(FIND_MY_STRUCTURES, {
             filter: (structure) => ( structure.structureType == STRUCTURE_POWER_SPAWN )
         });
-        this.memory.powerSpawns = [];
+        if (powerSpawns.length > 0) {
+            this.memory.powerSpawns = [];
 
-        // for each entry add to memory ( if not contained )
-        let add = (powerSpawn) => {
-            let powerSpawnData = this.memory.powerSpawns.find( (l) => l.id == powerSpawn.id );
-            if( !powerSpawnData ) {
-                this.memory.powerSpawns.push({
-                    id: powerSpawn.id,
-                });
-            }
-        };
-        powerSpawns.forEach(add);
+            // for each entry add to memory ( if not contained )
+            let add = (powerSpawn) => {
+                let powerSpawnData = this.memory.powerSpawns.find( (l) => l.id == powerSpawn.id );
+                if( !powerSpawnData ) {
+                    this.memory.powerSpawns.push({
+                        id: powerSpawn.id,
+                    });
+                }
+            };
+            powerSpawns.forEach(add);
+        } else delete this.memory.powerSpawns;
     };
     Room.prototype.saveExtensions = function() {
-        this.memory.extensions = this.find(FIND_MY_STRUCTURES, {
+        const extensions = this.find(FIND_MY_STRUCTURES, {
             filter: s => s instanceof StructureExtension
         }).map(s => s.id);
+        if (extensions.length > 0) this.memory.extensions = extensions;
+        else delete this.memory.extensions;
     };
     Room.prototype.saveContainers = function(){
-        this.memory.container = [];
         let containers = this.structures.all.filter(
             structure => structure.structureType == STRUCTURE_CONTAINER
         );
-        let add = (cont) => {
-            // TODO consolidate managed container code
-            let minerals = this.find(FIND_MINERALS);
-            let source = cont.pos.findInRange(this.sources, 2);
-            let mineral = cont.pos.findInRange(minerals, 2);
-            let isControllerContainer = !!(this.my && cont.pos.getRangeTo(this.controller) <= 4);
-            this.memory.container.push({
-                id: cont.id,
-                source: (source.length > 0),
-                controller: isControllerContainer,
-                mineral: (mineral.length > 0),
-            });
-            let assignContainer = s => s.memory.container = cont.id;
-            source.forEach(assignContainer);
-            mineral.forEach(assignContainer);
-        };
-        containers.forEach(add);
+        if (containers.length > 0) {
+            this.memory.container = [];
+            let add = (cont) => {
+                // TODO consolidate managed container code
+                let minerals = this.find(FIND_MINERALS);
+                let source = cont.pos.findInRange(this.sources, 2);
+                let mineral = cont.pos.findInRange(minerals, 2);
+                let isControllerContainer = !!(this.my && cont.pos.getRangeTo(this.controller) <= 4);
+                this.memory.container.push({
+                    id: cont.id,
+                    source: (source.length > 0),
+                    controller: isControllerContainer,
+                    mineral: (mineral.length > 0),
+                });
+                let assignContainer = s => s.memory.container = cont.id;
+                source.forEach(assignContainer);
+                mineral.forEach(assignContainer);
+            };
+            containers.forEach(add);
+        } else delete this.memory.container;
 
         if( this.terminal ) {
             // terminal in range <= 2 is too simplistic for certain room placements near sources. See #681
@@ -1322,75 +1331,74 @@ mod.extend = function(){
         }
     };
     Room.prototype.saveLinks = function(){
-        if( _.isUndefined(this.memory.links) ){
-            this.memory.links = [];
-        }
         let links = this.find(FIND_MY_STRUCTURES, {
             filter: (structure) => ( structure.structureType == STRUCTURE_LINK )
         });
-        let storageLinks = this.storage ? this.storage.pos.findInRange(links, 2).map(l => l.id) : [];
+        if (links.length > 0) {
+            this.memory.links = [];
+            let storageLinks = this.storage ? this.storage.pos.findInRange(links, 2).map(l => l.id) : [];
 
-        // for each memory entry, keep if existing
-        /*
-        let kept = [];
-        let keep = (entry) => {
-            if( links.find( (c) => c.id == entry.id )){
-                entry.storage = storageLinks.includes(entry.id);
-                kept.push(entry);
-            }
-        };
-        this.memory.links.forEach(keep);
-        this.memory.links = kept;
-        */
-        this.memory.links = [];
-
-        // for each link add to memory ( if not contained )
-        let add = (link) => {
-            // TODO consolidate managed container code
-            if( !this.memory.links.find( (l) => l.id == link.id ) ) {
-                let isControllerLink = ( link.pos.getRangeTo(this.controller) <= 4 );
-                let isSource = false;
-                if( !isControllerLink ) {
-                    let source = link.pos.findInRange(this.sources, 2);
-                    let assign = s => s.memory.link = link.id;
-                    source.forEach(assign);
-                    isSource = source.length > 0;
+            // for each memory entry, keep if existing
+            /*
+            let kept = [];
+            let keep = (entry) => {
+                if( links.find( (c) => c.id == entry.id )){
+                    entry.storage = storageLinks.includes(entry.id);
+                    kept.push(entry);
                 }
-                this.memory.links.push({
-                    id: link.id,
-                    storage: storageLinks.includes(link.id),
-                    controller: isControllerLink,
-                    source: isSource
-                });
-            }
-        };
-        links.forEach(add);
+            };
+            this.memory.links.forEach(keep);
+            this.memory.links = kept;
+            */
+            this.memory.links = [];
+
+            // for each link add to memory ( if not contained )
+            let add = (link) => {
+                // TODO consolidate managed container code
+                if( !this.memory.links.find( (l) => l.id == link.id ) ) {
+                    let isControllerLink = ( link.pos.getRangeTo(this.controller) <= 4 );
+                    let isSource = false;
+                    if( !isControllerLink ) {
+                        let source = link.pos.findInRange(this.sources, 2);
+                        let assign = s => s.memory.link = link.id;
+                        source.forEach(assign);
+                        isSource = source.length > 0;
+                    }
+                    this.memory.links.push({
+                        id: link.id,
+                        storage: storageLinks.includes(link.id),
+                        controller: isControllerLink,
+                        source: isSource
+                    });
+                }
+            };
+            links.forEach(add);
+        } else delete this.memory.links;
     };
     Room.prototype.saveLabs = function(){
-        if( _.isUndefined(this.memory.labs) ){
-            this.memory.labs = [];
-        }
         let labs = this.find(FIND_MY_STRUCTURES, {
             filter: (structure) => ( structure.structureType == STRUCTURE_LAB )
         });
-        let storageLabs = this.storage ? this.storage.pos.findInRange(labs, 2).map(l => l.id) : [];
+        if (labs.length > 0) {
+            this.memory.labs = [];
+            let storageLabs = this.storage ? this.storage.pos.findInRange(labs, 2).map(l => l.id) : [];
 
-        this.memory.labs = [];
+            this.memory.labs = [];
 
-        // for each entry add to memory ( if not contained )
-        let add = (lab) => {
-            let labData = this.memory.labs.find( (l) => l.id == lab.id );
-            if( !labData ) {
-                this.memory.labs.push({
-                    id: lab.id,
-                    storage: storageLabs.includes(lab.id),
-                });
-            }
-        };
-        labs.forEach(add);
+            // for each entry add to memory ( if not contained )
+            let add = (lab) => {
+                let labData = this.memory.labs.find( (l) => l.id == lab.id );
+                if( !labData ) {
+                    this.memory.labs.push({
+                        id: lab.id,
+                        storage: storageLabs.includes(lab.id),
+                    });
+                }
+            };
+            labs.forEach(add);
+        } else delete this.memory.labs;
     };
     Room.prototype.saveMinerals = function() {
-        let that = this;
         let toPos = o => {
             return {
                 x: o.pos.x,
@@ -1404,11 +1412,11 @@ mod.extend = function(){
             x: m.pos.x,
             y: m.pos.y
         });
-        this._minerals = this.find(FIND_MINERALS).filter(hasExtractor);
-        if( this._minerals.length > 0 ){
+        const validMineral = this.find(FIND_MINERALS).filter(hasExtractor);
+        if( validMineral.length > 0 ){
             let id = o => o.id;
-            this.memory.minerals = _.map(that._minerals, id);
-        } else this.memory.minerals = [];
+            this.memory.minerals = _.map(validMineral, id);
+        } else delete this.memory.minerals;
     };
 
     Room.prototype.linkDispatcher = function () {
