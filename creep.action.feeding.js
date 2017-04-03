@@ -18,7 +18,7 @@ action.newTarget = function(creep){
     if (creep.room.energyAvailable === creep.room.energyCapacityAvailable) {
         return null;
     }
-    return creep.pos.findClosestByRange(creep.room.feedable, {
+    return creep.pos.findClosestByRange(creep.room.structures.feedable, {
         filter: (structure) => {
             return action.isValidTarget(structure) && action.isAddableTarget(structure, creep);
         }
