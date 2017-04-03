@@ -135,8 +135,9 @@ global.install = () => {
         Tower: load("tower"),
         Util: load('util'),
         Events: load('events'),
+        OCSMemory: load('ocsMemory'),
         Grafana: GRAFANA ? load('grafana') : undefined,
-        Visuals: ROOM_VISUALS && !Memory.CPU_CRITICAL ? load('visuals') : undefined,
+        Visuals: ROOM_VISUALS ? load('visuals') : undefined,
     });
     _.assign(global.Util, {
         DiamondIterator: load('util.diamond.iterator'),
@@ -188,6 +189,7 @@ global.install = () => {
         },
         behaviour: {
             claimer: load("creep.behaviour.claimer"),
+            collapseWorker: load("creep.behaviour.collapseWorker"),
             hauler: load("creep.behaviour.hauler"),
             healer: load("creep.behaviour.healer"),
             melee: load("creep.behaviour.melee"),
@@ -225,8 +227,11 @@ global.install = () => {
     Spawn.extend();
     FlagDir.extend();
     Task.populate();
+    
+    if (ROOM_VISUALS) Visuals.extend();
     // custom extend
     if( global.mainInjection.extend ) global.mainInjection.extend();
+    OCSMemory.activateSegment(MEM_SEGMENTS.COSTMATRIX_CACHE, true);
     if (DEBUG) logSystem('Global.install', 'Code reloaded.');
 };
 global.install();
@@ -256,6 +261,10 @@ module.exports.loop = function () {
     }
     // ensure up to date parameters
     _.assign(global, load("parameter"));
+    
+    // process loaded memory segments
+    OCSMemory.processSegments();
+    p.checkCPU('processSegments', PROFILING.ANALYZE_LIMIT);
 
     // Flush cache
     Events.flush();
@@ -266,6 +275,9 @@ module.exports.loop = function () {
     // custom flush
     if( global.mainInjection.flush ) global.mainInjection.flush();
     p.checkCPU('flush', PROFILING.FLUSH_LIMIT);
+
+    // Room event hooks must be registered before analyze for costMatrixInvalid
+    Room.register();
 
     // analyze environment, wait a tick if critical failure
     if (!FlagDir.analyze()) {
@@ -311,9 +323,13 @@ module.exports.loop = function () {
     p.checkCPU('FlagDir.cleanup', PROFILING.ANALYZE_LIMIT);
     Population.cleanup();
     p.checkCPU('Population.cleanup', PROFILING.ANALYZE_LIMIT);
+    Room.cleanup(); 
+    p.checkCPU('Room.cleanup', PROFILING.ANALYZE_LIMIT);
     // custom cleanup
     if( global.mainInjection.cleanup ) global.mainInjection.cleanup();
 
+    OCSMemory.cleanup(); // must come last
+    p.checkCPU('OCSMemory.cleanup', PROFILING.ANALYZE_LIMIT);
     if ( ROOM_VISUALS && !Memory.CPU_CRITICAL && Visuals ) Visuals.run(); // At end to correctly display used CPU.
     p.checkCPU('visuals', PROFILING.EXECUTE_LIMIT);
 
