@@ -262,8 +262,11 @@ module.exports.loop = function () {
     if (Memory.cloaked === undefined) {
         Memory.cloaked = {};
     }
+    
+    Util.set(Memory, 'parameters', {});
+    _.assign(global, {parameters: Memory.parameters}); // allow for shorthand access in console
     // ensure up to date parameters, override in memory
-    _.assign(global, load("parameter", Memory.parameters));
+    _.assign(global, load("parameter", parameters));
    
     // process loaded memory segments
     OCSMemory.processSegments();
