@@ -370,10 +370,15 @@ mod.creep = {
     worker: {
         fixedBody: {
             [CARRY]: 3,
-            [MOVE]: 3,
-            [WORK]: 3,
+            [MOVE]: 4,
+            [WORK]: 4,
         },
-        multiBody: [], 
+        multiBody: {
+            [CARRY]: 1,
+            [MOVE]: 2,
+            [WORK]: 2,
+        },
+        maxMulti: 3,
         behaviour: 'remoteWorker',
         queue: 'Low'
     }
