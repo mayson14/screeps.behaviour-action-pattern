@@ -18,9 +18,6 @@ mod.extend = function(){
             'all': {
                 configurable: true,
                 get: function() {
-                    if( _.isUndefined(this.room.memory.container)) {
-                        this.room.saveContainers();
-                    }
                     if( _.isUndefined(this._container) ){
                         this._container = [];
                         let add = entry => {
@@ -106,9 +103,6 @@ mod.extend = function(){
             'all': {
                 configurable: true,
                 get: function() {
-                    if( _.isUndefined(this.room.memory.links)) {
-                        this.room.saveLinks();
-                    }
                     if( _.isUndefined(this._all) ){
                         this._all = [];
                         let add = entry => {
@@ -173,9 +167,6 @@ mod.extend = function(){
             'all': {
                 configurable: true,
                 get: function() {
-                    if( _.isUndefined(this.room.memory.labs)) {
-                        this.room.saveLabs();
-                    }
                     if( _.isUndefined(this._all) ){
                         this._all = [];
                         let add = entry => {
@@ -210,9 +201,6 @@ mod.extend = function(){
             'all': {
                 configurable: true,
                 get: function() {
-                    if( _.isUndefined(this.room.memory.powerSpawns)) {
-                        this.room.savePowerSpawns();
-                    }
                     if( _.isUndefined(this._all) ){
                         this._all = [];
                         let add = entry => {
@@ -237,9 +225,6 @@ mod.extend = function(){
             'all': {
                 configurable: true,
                 get: function() {
-                    if( _.isUndefined(this.room.memory.nukers)) {
-                        this.room.saveNukers();
-                    }
                     if( _.isUndefined(this._all) ){
                         this._all = [];
                         let add = entry => {
@@ -282,9 +267,6 @@ mod.extend = function(){
             'spawns': {
                 configurable: true,
                 get: function() {
-                    if( _.isUndefined(this.room.memory.spawns) ) {
-                        this.room.saveSpawns();
-                    }
                     if( _.isUndefined(this._spawns) ){
                         this._spawns = [];
                         var addSpawn = id => { addById(this._spawns, id); };
@@ -296,9 +278,6 @@ mod.extend = function(){
             'towers': {
                 configurable: true,
                 get: function() {
-                    if( _.isUndefined(this.room.memory.towers)) {
-                        this.room.saveTowers();
-                    }
                     if( _.isUndefined(this._towers) ){
                         this._towers = [];
                         var add = id => { addById(this._towers, id); };
@@ -432,9 +411,6 @@ mod.extend = function(){
             'observer': {
                 configurable: true,
                 get: function() {
-	                if (_.isUndefined(this.room.memory.observer)) {
-		                this.room.saveObserver();
-	                }
                     if (_.isUndefined(this._observer) && this.room.memory.observer) {
 	                    this._observer = Game.getObjectById(this.room.memory.observer.id);
                     }
@@ -444,9 +420,6 @@ mod.extend = function(){
             'nuker': {
                 configurable: true,
                 get: function() {
-                    if (_.isUndefined(this.room.memory.nukers)) {
-                        this.room.saveNukers();
-                    }
                     if (_.isUndefined(this._nuker)) {
                         if (this.room.memory.nukers && this.room.memory.nukers.length > 0) {
                             this._nuker = Game.getObjectById(this.room.memory.nukers[0].id);
@@ -467,9 +440,6 @@ mod.extend = function(){
             'powerSpawn': {
                 configurable: true,
                 get: function() {
-                    if (_.isUndefined(this.room.memory.powerSpawns)) {
-                        this.room.savePowerSpawns();
-                    }
                     if (_.isUndefined(this._powerSpawn)) {
                         if (this.room.memory.powerSpawns && this.room.memory.powerSpawns.length > 0) {
                             this._powerSpawn = Game.getObjectById(this.room.memory.powerSpawns[0].id);
@@ -853,9 +823,6 @@ mod.extend = function(){
         'minerals': {
             configurable:true,
             get: function () {
-                if( _.isUndefined(this.memory.minerals)) {
-                    this.saveMinerals();
-                }
                 if( _.isUndefined(this._minerals) ){
                     this._minerals = [];
                     let add = id => { addById(this._minerals, id); };
@@ -2816,7 +2783,8 @@ mod.analyze = function() {
     const totalStructuresChanged = Room.totalStructuresChanged();
     const getEnvironment = room => {
         try {
-            if( Game.time % MEMORY_RESYNC_INTERVAL == 0 || room.name == 'sim' ) {
+            if (!room.memory.initialized || Game.time % MEMORY_RESYNC_INTERVAL == 0 || room.name == 'sim' ) {
+                room.memory.initialized = Game.time;
                 room.saveMinerals();
                 room.saveTowers();
                 room.saveSpawns();
@@ -2827,11 +2795,13 @@ mod.analyze = function() {
                 room.saveContainers();
                 room.saveLinks();
                 room.saveLabs();
+                if (room.structures.observer) room.initObserverRooms(); // to re-evaluate rooms, in case parameters are changed
+                room.processConstructionFlags();
+            }
+            if (Game.time % PROCESS_ORDERS_INTERVAL === 0 || room.name === 'sim') {
                 room.updateResourceOrders();
                 room.updateRoomOrders();
                 room.terminalBroker();
-                if (room.structures.observer) room.initObserverRooms(); // to re-evaluate rooms, in case parameters are changed
-                room.processConstructionFlags();
             }
             room.roadConstruction();
             if (room.structures.links.all.length > 0) room.linkDispatcher();
