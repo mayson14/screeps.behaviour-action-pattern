@@ -16,16 +16,16 @@ mod.extend = function(){
         let that = this;
         let probe = setup => {
             return setup.isValidSetup(room) && that.createCreepBySetup(setup);
-        }
+        };
 
-        let busy = this.createCreepByQueue(room.spawnQueueHigh);
+        let busy = this.createCreepByQueue(room.spawnQueueHigh, 'high');
         // don't spawn lower if there is one waiting in the higher queue 
         if( !busy && room.spawnQueueHigh.length == 0 && Game.time % SPAWN_INTERVAL == 0 ) {
             busy = _.some(Spawn.priorityHigh, probe);
-            if( !busy ) busy = this.createCreepByQueue(room.spawnQueueMedium);
+            if( !busy ) busy = this.createCreepByQueue(room.spawnQueueMedium, 'medium');
             if( !busy && room.spawnQueueMedium.length == 0 ) {
                 busy = _.some(Spawn.priorityLow, probe);
-                if( !busy ) busy = this.createCreepByQueue(room.spawnQueueLow);
+                if( !busy ) busy = this.createCreepByQueue(room.spawnQueueLow, 'low');
             }
         }
         return busy;
@@ -37,18 +37,21 @@ mod.extend = function(){
             return params;
         return null;
     };
-    Spawn.prototype.createCreepByQueue = function(queue){
+    Spawn.prototype.createCreepByQueue = function(queue, level){
         if (!queue) return null;
-        const original = _.cloneDeep(queue);
+        else if (Memory.CPU_CRITICAL && this.memory.spawnDelay[level] === queue.length) return null;
         let params;
-        do {
-            if (queue.length === 0) break;
-            params = queue.shift();
-        } while (Memory.CPU_CRITICAL && !CRITICAL_ROLES.includes(params.behaviour));
-        if (queue.length === 0 && !params) {
-            queue = original;
+        for (const index in queue) {
+            const entry = queue[index];
+            if (Memory.CPU_CRITICAL && CRITICAL_ROLES.includes(entry.behaviour)) continue;
+            else params = queue.splice(index, 1)[0];
+        }
+        if (!params) {
+            global.logSystem(this.pos.roomName, dye(CRAYON.error, 'Delaying spawn until CPU is not CRITICAL, or new entries are added.' ));
+            this.memory.spawnDelay[level] = queue.length;
             return null;
         }
+        delete this.memory.spawnDelay[level];
         let cost = 0;
         params.parts.forEach(function(part){
             cost += BODYPART_COST[part];
