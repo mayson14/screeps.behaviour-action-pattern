@@ -172,7 +172,7 @@ mod.checkForRequiredCreeps = (flag) => {
 
     if( DEBUG && TRACE ) trace('Task', {Task:mod.name, flagName:flag.name, sourceCount, haulerCount, minerCount, workerCount, [mod.name]:'Flag.found'}, 'checking flag@', flag.pos);
 
-    if(Task.mining.strategies.miner.shouldSpawn(minerCount, sourceCount)) {
+    if(mod.strategies.miner.shouldSpawn(minerCount, sourceCount)) {
         if( DEBUG && TRACE ) trace('Task', {Task:mod.name, room:roomName, minerCount,
             minerTTLs: _.map(_.map(memory.running.remoteMiner, n=>Game.creeps[n]), "ticksToLive"), [mod.name]:'minerCount'});
 
