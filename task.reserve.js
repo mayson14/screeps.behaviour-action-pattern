@@ -258,7 +258,7 @@ mod.strategies = {
                 Game.time - flag.memory.lastVisible > ((flag.memory.ticksToEnd - 250) || 250)) {
                 params.count = 1;
                 params.queue = 'Medium';
-                if( DEBUG && TRACE ) trace('Task', {validReservation, isOwned, urgent, lastVisible: flag.memory.lastVisible,
+                if( DEBUG && TRACE ) trace('Task', {lastVisible: flag.memory.lastVisible,
                     tickToEnd: flag.memory.ticksToEnd, checkForRequiredCreeps:'sending urgent reserver, no visibility',
                     [mod.name]:'checkForRequiredCreeps', Task:mod.name});                
             }
