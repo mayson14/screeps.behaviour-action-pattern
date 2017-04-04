@@ -506,105 +506,105 @@ Visuals.extend = function() {
 };
 
 Visuals.run = function() {
-    const p = Util.startProfiling('Visuals', Game.cpu.getUsed());
+    const p = Util.startProfiling('Visuals', {enabled:PROFILING.VISUALS});
     for (let roomName in Game.rooms) {
         const room = Game.rooms[roomName];
         if (!ROOM_VISUALS_ALL && !room.my) continue;
         if (!room.controller) continue;
+        const p2 = Util.startProfiling('Visuals:' + roomName, {enabled:PROFILING.VISUALS});
         
         if (Memory.heatmap === undefined) Memory.heatmap = false;
         
         if (VISUALS.HEATMAP) {
             if (Game.time % VISUALS.HEATMAP_INTERVAL === 0) {
                 Visuals.setHeatMapData(room);
-                p.checkCPU('Heatmap.set');
+                p2.checkCPU('Heatmap.set', VISUALS_LIMIT);
             }
             
             if (Memory.heatmap) {
                 Visuals.drawHeatMapData(room);
-                p.checkCPU('Heatmap.draw');
+                p2.checkCPU('Heatmap.draw', VISUALS_LIMIT);
                 continue;
             }
         }
         
         if (VISUALS.ROOM) {
             Visuals.drawRoomInfo(room, VISUALS.ROOM_GLOBAL);
-            p.checkCPU('Room Info')
+            p2.checkCPU('Room Info', VISUALS_LIMIT);
         }
         if (VISUALS.ROOM_ORDERS) {
             Visuals.drawRoomOrders(room);
-            p.checkCPU('Room Orders');
+            p2.checkCPU('Room Orders', VISUALS_LIMIT);
         }
         if (VISUALS.ROOM_OFFERS) {
             Visuals.drawRoomOffers(room);
-            p.checkCPU('Room Offers');
+            p2.checkCPU('Room Offers', VISUALS_LIMIT);
         }
         if (VISUALS.CONTROLLER) {
             Visuals.drawControllerInfo(room.controller);
-            p.checkCPU('Controller');
+            p2.checkCPU('Controller', VISUALS_LIMIT);
         }
         if (VISUALS.SPAWN) {
             room.structures.spawns.filter(s => s.spawning).forEach(Visuals.drawSpawnInfo);
-            p.checkCPU('Spawns')
+            p2.checkCPU('Spawns', VISUALS_LIMIT);
         }
         if (VISUALS.MINERAL) {
             let [mineral] = room.minerals;
             if (mineral) {
                 Visuals.drawMineralInfo(mineral);
-                p.checkCPU('Mineral');
+                p2.checkCPU('Mineral', VISUALS_LIMIT);
             }
         }
         if (VISUALS.SOURCE) {
             room.sources.forEach(Visuals.drawSourceInfo);
-            p.checkCPU('Sources');
+            p2.checkCPU('Sources', VISUALS_LIMIT);
         }
         if (VISUALS.WALL) {
             Visuals.highlightWeakest(room, STRUCTURE_WALL);
-            p.checkCPU('Walls');
+            p2.checkCPU('Walls', VISUALS_LIMIT);
         }
         if (VISUALS.RAMPART) {
             Visuals.highlightWeakest(room, STRUCTURE_RAMPART);
-            p.checkCPU('Ramparts');
+            p2.checkCPU('Ramparts', VISUALS_LIMIT);
         }
         if (VISUALS.ROAD) {
             Visuals.highlightWeakest(room, STRUCTURE_ROAD);
-            p.checkCPU('Roads');
+            p2.checkCPU('Roads', VISUALS_LIMIT);
         }
         if (VISUALS.STORAGE) {
             Visuals.storage(room);
-            p.checkCPU('Storage');
+            p2.checkCPU('Storage', VISUALS_LIMIT);
         }
         if (VISUALS.TERMINAL) {
             Visuals.terminal(room);
-            p.checkCPU('Terminal');
+            p2.checkCPU('Terminal', VISUALS_LIMIT);
         }
         if (VISUALS.TOWER) {
             room.structures.towers.forEach(Visuals.drawTowerInfo);
-            p.checkCPU('Towers');
+            p2.checkCPU('Towers', VISUALS_LIMIT);
         }
         if (VISUALS.TRANSACTIONS) {
             Visuals.drawTransactions(room);
-            p.checkCPU('Transactions');
+            p2.checkCPU('Transactions', VISUALS_LIMIT);
         }
         if (VISUALS.LABS) {
             Visuals.drawLabs(room);
-            p.checkCPU('Labs');
+            p2.checkCPU('Labs', VISUALS_LIMIT);
         }
         if (VISUALS.CREEP) {
             Visuals.drawCreepPath(room);
-            p.checkCPU('Creep Paths');
+            p2.checkCPU('Creep Paths', VISUALS_LIMIT);
         }
     }
-    p.checkCPU('Room Loop');
+    p.checkCPU('Room Loop', VISUALS_LIMIT);
     if (VISUALS.ROOM_GLOBAL) {
         if (VISUALS.CPU) {
             Visuals.collectSparklineStats();
-            p.checkCPU('CPU Sparklines');
+            p.checkCPU('CPU Sparklines', VISUALS_LIMIT);
         }
         Visuals.drawGlobal();
-        p.checkCPU('Global');
+        p.checkCPU('Global', VISUALS_LIMIT);
     }
-    p.totalCPU();
 };
 
 function formatNum(n) {
