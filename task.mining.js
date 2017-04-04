@@ -481,12 +481,6 @@ mod.strategies = {
     defaultStrategy: {
         name: `default-${mod.name}`,
     },
-    miner: {
-        name: `miner-${mod.name}`,
-        shouldSpawn: function(minerCount, sourceCount) {
-            return minerCount < sourceCount;
-        },
-    },
     reserve: {
         name: `reserve-${mod.name}`,
         spawnParams: function(flag) {
@@ -500,6 +494,15 @@ mod.strategies = {
 
             return Task.reserve.strategies.defaultStrategy.spawnParams(flag);
         }
+    },
+    miner: {
+        name: `miner-${mod.name}`,
+        setup: function(roomName) {
+            return Task.mining.setupCreep(roomName, Task.mining.creep.miner);
+        },
+        shouldSpawn: function(minerCount, sourceCount) {
+            return minerCount < sourceCount;
+        },
     },
     hauler: {
         name: `hauler-${mod.name}`,
