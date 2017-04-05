@@ -1105,8 +1105,8 @@ mod.extend = function(){
         if (!_.isUndefined(this.memory.myTotalStructures) && numStructures < this.memory.myTotalStructures) {
             Room.costMatrixInvalid.trigger(this);
             // these are vital for feeding
-            room.saveExtensions();
-            room.saveSpawns();
+            this.saveExtensions();
+            this.saveSpawns();
         }
         if (numStructures > 0) this.memory.myTotalStructures = numStructures;
         else delete this.memory.myTotalStructures;
