@@ -1,7 +1,7 @@
 let action = new Creep.Action('attackController');
 module.exports = action;
 action.isValidAction = function(creep){ return true; }; 
-action.isValidTarget = function(target){ return target && (!target.reservation || target.reservation !== ME) && creep.flag; };
+action.isValidTarget = function(target){ return target && (!target.reservation || !Task.reputation.allyOwner(target.reservation)) && creep.flag; };
 action.isAddableAction = function(){ return true; };
 action.isAddableTarget = function(target){ return target &&
     ( target instanceof Flag || ( target.structureType === 'controller' && (target.reservation || target.owner)) ); 
@@ -52,7 +52,8 @@ action.work = function(creep){
 
     creep.controllerSign();
 
-    if( creep.target.owner && !creep.target.my ){
+    if( (creep.target.owner && !creep.target.my) ||
+        (creep.target.reservation && !Task.reputation.allyOwner(creep.target.reservation))){
         workResult = creep.attackController(creep.target);
     }
     else {
