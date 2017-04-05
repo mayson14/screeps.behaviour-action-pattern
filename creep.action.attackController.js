@@ -1,10 +1,10 @@
 let action = new Creep.Action('attackController');
 module.exports = action;
 action.isValidAction = function(creep){ return true; }; 
-action.isValidTarget = function(target){ return target && (!target.reservation ); };
+action.isValidTarget = function(target){ return target && (!target.reservation || target.reservation !== ME); };
 action.isAddableAction = function(){ return true; };
 action.isAddableTarget = function(target){ return target &&
-    ( target instanceof Flag || ( target.structureType === 'controller' && target.owner ) ); 
+    ( target instanceof Flag || ( target.structureType === 'controller' && (target.reservation || target.owner)) ); 
 };
 action.newTarget = function(creep){
     let validColor = flagEntry => (
@@ -43,8 +43,9 @@ action.step = function(creep){
         if( workResult != OK ) {
             creep.handleError({errorCode:workResult,action,target:creep.target,range,creep});
         }
+    } else {
+        creep.travelTo(creep.target);
     }
-    creep.travelTo(creep.target);
 };
 action.work = function(creep){
     var workResult;
