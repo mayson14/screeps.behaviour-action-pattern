@@ -26,7 +26,6 @@ mod.nextAction = function(creep){
         delete creep.data.nextAction;
         delete creep.data.nextTarget;
         if (action && target && action.assign(creep, target)) {
-            console.log(creep.name, 'assigning stored nextAction & nextTarget', action.name, target.id);
             return;   
         }
     }
