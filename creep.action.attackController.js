@@ -1,7 +1,7 @@
 let action = new Creep.Action('attackController');
 module.exports = action;
 action.isValidAction = function(creep){ return true; }; 
-action.isValidTarget = function(target){ return target && (!target.reservation || target.reservation !== ME); };
+action.isValidTarget = function(target){ return target && (!target.reservation || target.reservation !== ME) && creep.flag; };
 action.isAddableAction = function(){ return true; };
 action.isAddableTarget = function(target){ return target &&
     ( target instanceof Flag || ( target.structureType === 'controller' && (target.reservation || target.owner)) ); 
