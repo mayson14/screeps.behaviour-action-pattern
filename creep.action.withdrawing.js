@@ -2,6 +2,7 @@ let action = new Creep.Action('withdrawing');
 module.exports = action;
 action.isValidAction = function(creep){
     return (
+        creep.room.storage && 
         creep.data.creepType !== 'privateer' &&
         creep.sum < creep.carryCapacity &&
         (!creep.room.conserveForDefense || creep.room.relativeEnergyAvailable < 0.8)
@@ -30,7 +31,9 @@ action.assignDebounce = function(creep, outflowActions) {
             room: creep.room,
             sum: creep.carryCapacity
         };
-        dummyCreep.carry[RESOURCE_ENERGY] = creep.carryCapacity; // assume we get a full load of energy
+        const stored = creep.room.storage.store[RESOURCE_ENERGY];
+        const maxWithdraw = stored > creep.carryCapacity ? creep.carryCapacity : stored;
+        dummyCreep.carry[RESOURCE_ENERGY] = maxWithdraw; // assume we get a full load of energy
         let target = null;
         const validAction = _.find(outflowActions, a => {
             if (a.name !== 'storing' && a.isValidAction(dummyCreep) && a.isAddableAction(dummyCreep)) {
