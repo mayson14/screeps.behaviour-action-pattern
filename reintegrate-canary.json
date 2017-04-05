@@ -1,0 +1,31 @@
+{
+  "ocs.internal": {
+    "reset": "upstream/dev",
+    "merge": [
+      "upstream/change/diplomaticDictatorship",
+      "upstream/feature/actionRenewing",
+      "upstream/task/invasion",
+      "upstream/task/train-basic"
+    ]
+  },
+  "ocs.public": {
+    "reset": "upstream/dev",
+    "merge": [
+      "upstream/bug/droppingMovesToRandomFlag",
+      "upstream/change/efficientFeeding",
+      "upstream/change/flags!",
+      "upstream/change/infectiousMemory",
+      "upstream/change/injectMerge",
+      "upstream/change/memoryReduction",
+      "upstream/change/pickingStrategyResources",
+      "upstream/change/visualsProfiling",
+      "upstream/feature/roomLayout",
+      "upstream/feature/traceAll",
+      "upstream/feature/xyiterator",
+      "upstream/fix/attackController",
+      "upstream/fix/daDebounce",
+      "upstream/fix/minersRepair",
+      "upstream/fix/visibleReservations"
+    ]
+  }
+}
