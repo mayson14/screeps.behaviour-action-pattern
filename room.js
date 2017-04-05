@@ -2934,7 +2934,7 @@ mod.findSpawnRoom = function(params){
     // filter validRooms
     let isValidRoom = room => (
         room.my && 
-        (params.maxRange === undefined || Util.routeRange(room.name, params.targetRoom) < params.maxRange) &&
+        (params.maxRange === undefined || Util.routeRange(room.name, params.targetRoom) <= params.maxRange) &&
         (params.minEnergyCapacity === undefined || params.minEnergyCapacity <= room.energyCapacityAvailable) &&
         (params.minEnergyAvailable === undefined || params.minEnergyAvailable <= room.energyAvailable) &&
         (room.name != params.targetRoom || params.allowTargetRoom === true) &&
