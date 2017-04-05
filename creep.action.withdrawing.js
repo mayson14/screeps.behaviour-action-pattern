@@ -2,7 +2,8 @@ let action = new Creep.Action('withdrawing');
 module.exports = action;
 action.isValidAction = function(creep){
     return (
-        creep.room.storage && 
+        ((creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY]) ||
+        (creep.room.terminal && creep.room.terminal.store[RESOURCE_ENERGY])) &&
         creep.data.creepType !== 'privateer' &&
         creep.sum < creep.carryCapacity &&
         (!creep.room.conserveForDefense || creep.room.relativeEnergyAvailable < 0.8)
@@ -50,4 +51,5 @@ action.assignDebounce = function(creep, outflowActions) {
     } else {
         return action.assign(creep);
     }
+    return false;
 };
