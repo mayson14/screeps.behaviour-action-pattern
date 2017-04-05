@@ -20,18 +20,31 @@ action.onAssignment = function(creep, target) {
     //if( SAY_ASSIGNMENT ) creep.say(String.fromCharCode(9738), SAY_PUBLIC);
     if( SAY_ASSIGNMENT ) creep.say(ACTION_SAY.WITHDRAWING, SAY_PUBLIC);
 };
-action.debounce = function(creep, outflowActions, callback, thisArg) {
-    let shouldCall = false;
+action.assignDebounce = function(creep, outflowActions) {
     if (creep.data.lastAction === 'storing' && creep.data.lastTarget === creep.room.storage.id) {
         // cycle detected
-        shouldCall = _.some(outflowActions, a => a.newTarget(creep));
+        const dummyCreep = {
+            carry:{},
+            owner: creep.owner,
+            pos: creep.pos,
+            room: creep.room,
+            sum: creep.carryCapacity
+        };
+        dummyCreep.carry[RESOURCE_ENERGY] = creep.carryCapacity; // assume we get a full load of energy
+        let target = null;
+        const validAction = _.find(outflowActions, a => {
+            if (a.name !== 'storing' && a.isValidAction(dummyCreep) && a.isAddableAction(dummyCreep)) {
+                target = a.newTarget(dummyCreep);
+                return !!target;
+            }
+            return false;
+        });
+        if (validAction && action.assign(creep)) {
+            creep.data.nextAction = validAction.name;
+            creep.data.nextTarget = target.id;
+            return true;
+        }
     } else {
-        shouldCall = true;
+        return action.assign(creep);
     }
-
-    if (shouldCall) {
-        return _.invoke([thisArg], callback, this)[0];
-    }
-
-    return undefined;
 };
