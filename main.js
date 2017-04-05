@@ -93,7 +93,8 @@ global.infect = (mod, namespace, modName) => {
 };
 // loads (require) a module. use this function anywhere you want to load a module.
 // respects custom and viral overrides
-global.load = (modName) => {
+// @param memory - optional memory to override members with
+global.load = (modName, memory) => {
     // read stored module path
     let path = getPath(modName);
     // try to load module
@@ -108,6 +109,9 @@ global.load = (modName) => {
         // load viral overrides 
         mod = infect(mod, 'internalViral', modName);
         mod = infect(mod, 'viral', modName);
+    }
+    if (memory) {
+        global.inject(mod, memory);
     }
     return mod;
 };
@@ -258,9 +262,12 @@ module.exports.loop = function () {
     if (Memory.cloaked === undefined) {
         Memory.cloaked = {};
     }
-    // ensure up to date parameters
-    _.assign(global, load("parameter"));
     
+    Util.set(Memory, 'parameters', {});
+    _.assign(global, {parameters: Memory.parameters}); // allow for shorthand access in console
+    // ensure up to date parameters, override in memory
+    _.assign(global, load("parameter", parameters));
+   
     // process loaded memory segments
     OCSMemory.processSegments();
     p.checkCPU('processSegments', PROFILING.ANALYZE_LIMIT);
